@@ -183,3 +183,232 @@ pub fn sort<T, P, C>(nodes: &mut [T], parent: P, children: C)
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(PartialEq, Debug)]
+    struct Node {
+        val: u32,
+        parent: Option<usize>,
+        children: Vec<usize>,
+    }
+
+    #[test]
+    fn empty() {
+        let mut nodes: Vec<Node> = vec![];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes.len(), 0);
+    }
+
+    #[test]
+    fn one() {
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 0, parent: None, children: vec![]}
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node {val: 0, parent: None, children: vec![]}
+        ]);
+    }
+
+    #[test]
+    fn two() {
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 0, parent: None, children: vec![]},
+            Node {val: 1, parent: None, children: vec![]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node {val: 0, parent: None, children: vec![]},
+            Node {val: 1, parent: None, children: vec![]},
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 1, parent: Some(1), children: vec![]},
+            Node {val: 0, parent: None, children: vec![0]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node {val: 0, parent: None, children: vec![1]},
+            Node {val: 1, parent: Some(0), children: vec![]},
+        ]);
+    }
+
+    #[test]
+    fn three() {
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(1), children: vec![]},
+            Node {val: 1, parent: Some(2), children: vec![0]},
+            Node {val: 0, parent: None, children: vec![1]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 1, parent: Some(2), children: vec![1]},
+            Node {val: 2, parent: Some(0), children: vec![]},
+            Node {val: 0, parent: None, children: vec![0]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(2), children: vec![]},
+            Node {val: 1, parent: Some(2), children: vec![]},
+            Node {val: 0, parent: None, children: vec![1, 0]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 2] },
+            Node { val: 1, parent: Some(0), children: vec![] },
+            Node { val: 2, parent: Some(0), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 1, parent: Some(2), children: vec![]},
+            Node {val: 2, parent: Some(2), children: vec![]},
+            Node {val: 0, parent: None, children: vec![0, 1]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 2] },
+            Node { val: 1, parent: Some(0), children: vec![] },
+            Node { val: 2, parent: Some(0), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 1, parent: Some(1), children: vec![]},
+            Node {val: 0, parent: None, children: vec![0, 2]},
+            Node {val: 2, parent: Some(1), children: vec![]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 2] },
+            Node { val: 1, parent: Some(0), children: vec![] },
+            Node { val: 2, parent: Some(0), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(1), children: vec![]},
+            Node {val: 0, parent: None, children: vec![2, 0]},
+            Node {val: 1, parent: Some(1), children: vec![]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 2] },
+            Node { val: 1, parent: Some(0), children: vec![] },
+            Node { val: 2, parent: Some(0), children: vec![] }
+        ]);
+    }
+
+    #[test]
+    fn four() {
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 3, parent: Some(1), children: vec![]},
+            Node {val: 2, parent: Some(2), children: vec![0]},
+            Node {val: 1, parent: Some(3), children: vec![1]},
+            Node {val: 0, parent: None, children: vec![2]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![3] },
+            Node { val: 3, parent: Some(2), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(2), children: vec![1]},
+            Node {val: 3, parent: Some(0), children: vec![]},
+            Node {val: 1, parent: Some(3), children: vec![0]},
+            Node {val: 0, parent: None, children: vec![2]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![3] },
+            Node { val: 3, parent: Some(2), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(3), children: vec![1]},
+            Node {val: 3, parent: Some(0), children: vec![]},
+            Node {val: 0, parent: None, children: vec![3]},
+            Node {val: 1, parent: Some(2), children: vec![0]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![3] },
+            Node { val: 3, parent: Some(2), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 2, parent: Some(2), children: vec![]},
+            Node {val: 3, parent: Some(3), children: vec![]},
+            Node {val: 1, parent: Some(3), children: vec![0]},
+            Node {val: 0, parent: None, children: vec![2, 1]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 3] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![] },
+            Node { val: 3, parent: Some(0), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 3, parent: Some(3), children: vec![]},
+            Node {val: 1, parent: None, children: vec![]},
+            Node {val: 2, parent: Some(3), children: vec![]},
+            Node {val: 0, parent: None, children: vec![2, 0]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![2, 3] },
+            Node { val: 1, parent: None, children: vec![] },
+            Node { val: 2, parent: Some(0), children: vec![] },
+            Node { val: 3, parent: Some(0), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 3, parent: Some(2), children: vec![]},
+            Node {val: 2, parent: Some(2), children: vec![]},
+            Node {val: 1, parent: Some(3), children: vec![1, 0]},
+            Node {val: 0, parent: None, children: vec![2]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1] },
+            Node { val: 1, parent: Some(0), children: vec![2, 3] },
+            Node { val: 2, parent: Some(1), children: vec![] },
+            Node { val: 3, parent: Some(1), children: vec![] }
+        ]);
+
+        let mut nodes: Vec<Node> = vec![
+            Node {val: 0, parent: None, children: vec![3, 2]},
+            Node {val: 2, parent: Some(3), children: vec![]},
+            Node {val: 3, parent: Some(0), children: vec![]},
+            Node {val: 1, parent: Some(0), children: vec![1]},
+        ];
+        sort(&mut nodes, |n| &mut n.parent, |n| &mut n.children);
+        assert_eq!(nodes, vec![
+            Node { val: 0, parent: None, children: vec![1, 3] },
+            Node { val: 1, parent: Some(0), children: vec![2] },
+            Node { val: 2, parent: Some(1), children: vec![] },
+            Node { val: 3, parent: Some(0), children: vec![] },
+        ]);
+    }
+}
