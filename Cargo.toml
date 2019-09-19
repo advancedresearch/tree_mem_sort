@@ -1,6 +1,6 @@
 [package]
 name = "advancedresearch-tree_mem_sort"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Sven Nilsen <bvssvni@gmail.com>"]
 edition = "2018"
 keywords = ["advancedresearch", "tree", "sort", "group", "theory"]
