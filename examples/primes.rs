@@ -47,11 +47,31 @@ pub struct Number {
 
 fn main() {
     let mut nodes = vec![
-        Number {value: 2, parent: Some(1), children: vec![]},       // 0
-        Number {value: 6, parent: Some(0), children: vec![4, 0]},   // 1
-        Number {value: 2, parent: Some(2), children: vec![]},       // 2
-        Number {value: 12, parent: None, children: vec![2, 1]},     // 3
-        Number {value: 3, parent: Some(2), children: vec![]},       // 4
+        Number {
+            value: 2,
+            parent: Some(1),
+            children: vec![],
+        }, // 0
+        Number {
+            value: 6,
+            parent: Some(0),
+            children: vec![4, 0],
+        }, // 1
+        Number {
+            value: 2,
+            parent: Some(2),
+            children: vec![],
+        }, // 2
+        Number {
+            value: 12,
+            parent: None,
+            children: vec![2, 1],
+        }, // 3
+        Number {
+            value: 3,
+            parent: Some(2),
+            children: vec![],
+        }, // 4
     ];
     for i in 0..nodes.len() {
         println!("{}: {:?}", i, nodes[i]);
