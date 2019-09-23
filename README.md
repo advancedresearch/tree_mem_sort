@@ -79,11 +79,31 @@ pub struct Number {
 
 fn main() {
     let mut nodes = vec![
-        Number {value: 2, parent: Some(1), children: vec![]},       // 0
-        Number {value: 6, parent: Some(0), children: vec![4, 0]},   // 1
-        Number {value: 2, parent: Some(2), children: vec![]},       // 2
-        Number {value: 12, parent: None, children: vec![2, 1]},     // 3
-        Number {value: 3, parent: Some(2), children: vec![]},       // 4
+        Number {
+            value: 2,
+            parent: Some(1),
+            children: vec![],
+        }, // 0
+        Number {
+            value: 6,
+            parent: Some(0),
+            children: vec![4, 0],
+        }, // 1
+        Number {
+            value: 2,
+            parent: Some(2),
+            children: vec![],
+        }, // 2
+        Number {
+            value: 12,
+            parent: None,
+            children: vec![2, 1],
+        }, // 3
+        Number {
+            value: 3,
+            parent: Some(2),
+            children: vec![],
+        }, // 4
     ];
     for i in 0..nodes.len() {
         println!("{}: {:?}", i, nodes[i]);
@@ -103,5 +123,61 @@ fn main() {
 
 ### Limitations
 
-The algorithm assumes that each node is referenced by maximum one parent.
+The `sort` algorithm assumes that each node is referenced by maximum one parent.
 If you share nodes between parent nodes, the algorithm might enter an infinite loop.
+
+One can use `sort_dag` to sort a tree where nodes can have multiple parents.
+In order for the algorithm to work with shared nodes,
+the tree must be a Directed Acyclic Graph (DAG).
+If the tree is not a DAG, the algorithm will run in an infinite loop.
+
+### Why topological sort on trees? Why not use DAG representation?
+
+The idea is to preserve the following properties, and otherwise minimize work:
+
+- Each child is greater than their parent
+- Each sibling is greater than previous siblings
+
+Topological sorts is often associated with Directed Acyclic Graphs (DAG) and not trees.
+This algorithm works on DAGs, but not on all trees with shared nodes.
+
+- If every node is referenced by maximum one parent, then it is automatically a DAG
+- Trees with ordered children encode arrows among siblings, which affects whether it is a DAG
+
+For example, the following tree with shared nodes is not a DAG:
+
+```text
+A
+|- B
+   |- D
+   |- C
+|- C
+   |- D
+```
+
+Notice that `B` orders `D` before `C`, so `D` is less than `C`.
+However, since `D` is a child of `C` it must be greater than `C`.
+This leads to a contradiction.
+
+If you try to sort the tree above using `sort_dag`, it will run in an infinite loop.
+
+Trees are easy to reason about and has a more efficient encoding for this library's common usage.
+For `N` children, the arrows of an equivalent DAG requires at least `N` arrows.
+In addition, these arrows must be arranged in a such way that the children becomes a total order.
+This is necessary to determine the order for every pair of children.
+By using a tree with ordered children, the memory required for arrows is zero,
+because the children are stored in an array anyway.
+
+A left-child first traversal of a tree without shared nodes
+can be used to produce a topological order.
+However, building indices from traversal of a tree makes all indices
+of a right-child larger than the indices of a left-child.
+This moves nodes around more than desirable.
+
+For forests, a tree traversal also requires an extra pass through all nodes.
+Here, the algorithm that sorts trees also works for forests without modification.
+
+A topological sort of a tree has the property that if you push a new node
+at the end of the array storing the nodes, which node's parent is any existing node,
+then the new tree is topologically sorted.
+The same is not true for indices built from tree traversal.
