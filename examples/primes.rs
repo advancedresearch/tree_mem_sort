@@ -54,12 +54,12 @@ fn main() {
         }, // 0
         Number {
             value: 6,
-            parent: Some(0),
+            parent: Some(3),
             children: vec![4, 0],
         }, // 1
         Number {
             value: 2,
-            parent: Some(2),
+            parent: Some(3),
             children: vec![],
         }, // 2
         Number {
@@ -69,7 +69,7 @@ fn main() {
         }, // 3
         Number {
             value: 3,
-            parent: Some(2),
+            parent: Some(1),
             children: vec![],
         }, // 4
     ];
